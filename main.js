@@ -324,3 +324,16 @@ boardComputerElement.addEventListener('click', (e) => {
       }
   }
 });
+
+restartButton.addEventListener('click', () => {
+  finishGame();
+  initGame();
+});
+
+toStartPageButton.addEventListener('click', () => {
+  finishGame();
+  player = null;
+  computer = null;
+  viewProcess.classList.add('visually-hidden');
+  viewStart.classList.remove('visually-hidden');
+});
