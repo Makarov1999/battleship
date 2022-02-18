@@ -183,3 +183,144 @@ class Ship {
       }
   }
 }
+
+class Player {
+  constructor(name) {
+      this.name = name;
+      this.score = 0;
+  }
+
+}
+
+class Computer {
+  constructor(name) {
+      this.name = name;
+      this.score = 0;
+  }
+}
+
+
+const startGameForm = document.querySelector('.start-game-form');
+const playerNameInput = document.querySelector('#player-name');
+const computerNameInput = document.querySelector('#computer-name');
+const viewStart = document.querySelector('.game__view--start');
+const viewProcess = document.querySelector('.game__view--process')
+const boardPlayerElement = document.querySelector('.board');
+const boardComputerElement = document.querySelector('.board--computer');
+const moveText = document.querySelector('.game__title--move');
+const boardPlayer = new Board(boardPlayerElement, BoardType.Player);
+const boardComputer = new Board(boardComputerElement, BoardType.Computer);
+const restartButton = document.querySelector('.message-control__button--restart');
+const toStartPageButton = document.querySelector('.message-control__button--start-page'); 
+let currentMoveOwner = MoveOwner.Player;
+let player = null;
+let computer = null;
+
+const initGame = () => {
+  boardPlayer.generateMatrix();
+  boardPlayer.generateRandomShips();
+  boardPlayer.renderBoard();
+  boardComputer.generateMatrix();
+  boardComputer.generateRandomShips();
+  boardComputer.renderBoard();
+}
+
+const finishGame = () => {
+    boardPlayer.clearMatrix();
+    boardComputer.clearMatrix();
+    boardComputerElement.innerHTML = '';
+    boardPlayerElement.innerHTML = '';
+    player.score = 0;
+    computer.score = 0;
+}
+
+
+
+const playerBoardCells = boardPlayerElement.querySelectorAll('.cell');
+
+startGameForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  player = new Player(playerNameInput.value);
+  computer = new Computer(computerNameInput.value);
+  playerNameInput.value = '';
+  computerNameInput.value = '';
+  viewStart.classList.add('visually-hidden');
+  viewProcess.classList.remove('visually-hidden');
+  initGame();
+  setPlayerMoveOwner();
+});
+
+
+const setComputerMoveOwner = () => {
+  moveText.textContent = `${computer.name} ходит`;
+  currentMoveOwner = MoveOwner.Computer;
+  const x = Board.generateRandomValue(Board.MATRIX_SIZE - 1);
+  const y = Board.generateRandomValue(Board.MATRIX_SIZE - 1);
+  const cellElement = boardPlayerElement.querySelector(`#ship${x}${y}`);
+  const cell = boardPlayer.matrix[x][y];
+  switch (cell) {
+      case MatrixCellState.NoShip:
+          setTimeout(() => {
+              boardPlayer.matrix[x][y] = MatrixCellState.ShootMiss;
+              cellElement.classList.add('cell--marked');
+              setPlayerMoveOwner();
+          }, 1000);
+          break;
+      case MatrixCellState.Ship:
+          setTimeout(() => {
+              boardPlayer.matrix[x][y] = MatrixCellState.ShootHit;
+              cellElement.classList.add('cell--defeated');
+              computer.score++;
+              if (computer.score === Board.POINTS_TO_WIN) {
+                moveText.textContent(`${computer.name} победил`)
+                return;
+              }
+              setComputerMoveOwner();
+          }, 1000)
+          break;
+      case MatrixCellState.ShootMiss:
+          setTimeout(() => {
+              setComputerMoveOwner();
+          }, 1000)
+          break;
+      case MatrixCellState.ShootHit:
+          setTimeout(() => {
+              setComputerMoveOwner();
+          }, 1000)
+          break;
+  }
+
+};
+
+const setPlayerMoveOwner = () => {
+  moveText.textContent = `${player.name} ходит`;
+  currentMoveOwner = MoveOwner.Player;
+};
+
+//клик по доске для обработки выстрела игрока, необходимо проверить что игрок не нарушает очередность и не кликает на ячейку пока ходит компьютер
+boardComputerElement.addEventListener('click', (e) => {
+  if (e.target.tagName === 'TD' && currentMoveOwner !== MoveOwner.Computer) {
+      const cell = boardComputer.matrix[e.target.dataset.x][e.target.dataset.y];
+      switch (cell) {
+          case MatrixCellState.NoShip:
+              boardComputer.matrix[e.target.dataset.x][e.target.dataset.y] = MatrixCellState.ShootMiss;
+              e.target.classList.add('cell--marked');
+              setComputerMoveOwner();
+              break;
+          case MatrixCellState.Ship:
+              player.score++;
+              boardComputer.matrix[e.target.dataset.x][e.target.dataset.y] = MatrixCellState.ShootHit;
+              e.target.classList.add('cell--defeated');
+              if (player.score === Board.POINTS_TO_WIN) {
+                moveText.textContent = `${player.name} победил`;
+              }
+              break;
+          case MatrixCellState.ShootMiss:
+              alert('Вы уже стреляли сюда и промахнулись');
+              break;
+          case MatrixCellState.ShootHit:
+              alert('Вы уже стреляли сюда и попали');
+              break;
+      }
+  }
+});
