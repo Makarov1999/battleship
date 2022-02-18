@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="img/favicon.png" type="image/png">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Морской бой</title>
+</head>
+<body>
+  <div class="game">
+    <div class="game__container">
+      
+      <div class="game__view game__view--start">
+        <h1 class="game__title">Добро пожаловать в игру Морской бой, давай знакомиться!</h1>
+        <form class="game__form start-game-form" action="#">
+          <fieldset class="start-game-form_group">
+            <div class="start-game-form__wrapper form-item">
+              <label class="form-item__label" for="player-name">Имя игрока</label>
+              <input type="text" id="player-name" required>
+            </div>
+            <div class="start-game-form__wrapper form-item">
+              <label class="form-item__label" for="computer-name">Имя компьютера</label>
+              <input type="text" id="computer-name" required>
+            </div>
+            <button class="start-game-button" type="submit">Начать игру</button>
+          </fieldset>
+        </form>
+      </div>
+      <div class="game__view game__view--process process-game visually-hidden">
+        <h1 class="game__title game__title--move">Ваш ход</h1>
+        <p class="process-game__description">Для выстрела необходимо кликнуть на ячейку</p>
+        <div class="process-game__container">
+          <div class="process-game__wrapper">
+            <div class="process-game__view process-game__view--player">
+              <h3 class="process-game__title">Ваше поле</h3>
+              <table class="board"></table>
+            </div>
+            <div class="process-game__view process-game__computer">
+              <h3 class="process-game__title">Поле противника</h3>
+              <table class="board--computer"></table>
+            </div>
+          </div>
+        </div>
+        <div class="game__control-panel control-panel ">
+          <button class="message-control__button message-control__button--restart">Переиграть</button>
+          <button class="message-control__button message-control__button--start-page">На стартовую страницу</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
